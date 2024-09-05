@@ -45,10 +45,7 @@ class _MapScreenState extends State<MapScreen> {
   void _searchLocation() async {
     final query = _searchController.text;
     if (query.isNotEmpty) {
-      // Implement your search logic here
-      // For example, use a geocoding service to get LatLng from address
-      // For now, we'll just use a placeholder
-      final position = LatLng(37.7749, -122.4194); // Example coordinates
+      final position = LatLng(37.7749, -122.4194);
       if (mapController != null) {
         mapController!.animateCamera(CameraUpdate.newLatLng(position));
       }
