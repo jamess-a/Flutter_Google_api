@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'location.dart';
+import 'cafe.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,10 +15,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // Variable to hold the theme mode
   ThemeMode _themeMode = ThemeMode.system;
 
-  // Function to toggle the theme mode
   void _toggleTheme(bool isDarkMode) {
     setState(() {
       _themeMode = isDarkMode ? ThemeMode.dark : ThemeMode.light;
@@ -32,13 +32,14 @@ class _MyAppState extends State<MyApp> {
         useMaterial3: true,
       ),
       darkTheme: ThemeData.dark().copyWith(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple, brightness: Brightness.dark),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.deepPurple, brightness: Brightness.dark),
         useMaterial3: true,
       ),
-      themeMode: _themeMode, 
+      themeMode: _themeMode,
       home: MyHomePage(
         title: 'Home Page',
-        onThemeChanged: _toggleTheme, 
+        onThemeChanged: _toggleTheme,
         isDarkMode: _themeMode == ThemeMode.dark,
       ),
     );
@@ -54,8 +55,8 @@ class MyHomePage extends StatefulWidget {
   });
 
   final String title;
-  final Function(bool) onThemeChanged; 
-  final bool isDarkMode; 
+  final Function(bool) onThemeChanged;
+  final bool isDarkMode;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -65,7 +66,10 @@ class _MyHomePageState extends State<MyHomePage> {
   void _openMapScreen() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => MapScreen()),
+      MaterialPageRoute(
+          builder: (context) => MapScreen(
+                destination: LatLng(0.0, 0.0),
+              )),
     );
   }
 
@@ -90,6 +94,15 @@ class _MyHomePageState extends State<MyHomePage> {
             ElevatedButton(
               onPressed: _openMapScreen,
               child: const Text('Open Map'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CafeListWidget()),
+                );
+              },
+              child: const Text('Cafe List'),
             ),
           ],
         ),
