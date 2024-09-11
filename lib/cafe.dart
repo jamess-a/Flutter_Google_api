@@ -3,8 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-import 'location.dart'; // Import the MapScreen
+import 'location.dart'; // Import your MapScreen
 
 class CafeListWidget extends StatefulWidget {
   @override
@@ -16,7 +15,7 @@ class _CafeListWidgetState extends State<CafeListWidget> {
   String _error = '';
   List<dynamic> _cafes = [];
   LatLng? _currentPosition;
-  final String apiKey = 'AIzaSyCN5iCJo4eq3UtebW1gvrdTN758Ul7rJO0'; // Replace with your API key
+  final String apiKey = 'AIzaSyCN5iCJo4eq3UtebW1gvrdTN758Ul7rJO0';
 
   @override
   void initState() {
@@ -62,6 +61,15 @@ class _CafeListWidgetState extends State<CafeListWidget> {
         _error = e.toString();
       });
     }
+  }
+
+  Future<String?> _getPhotoUrl(String photoReference) async {
+    final String photoUrl = 'https://maps.googleapis.com/maps/api/place/photo'
+        '?maxwidth=800'
+        '&photoreference=$photoReference'
+        '&key=$apiKey';
+
+    return photoUrl;
   }
 
   Future<Position> _getCurrentPosition() async {
@@ -113,23 +121,115 @@ class _CafeListWidgetState extends State<CafeListWidget> {
                       cafe['geometry']['location']['lat'],
                       cafe['geometry']['location']['lng'],
                     );
+                    final photoReference = cafe['photos'] != null
+                        ? cafe['photos'][0]['photo_reference']
+                        : null;
 
-                    return Card(
-                      margin: const EdgeInsets.all(8.0),
-                      child: ListTile(
-                        leading: Icon(Icons.local_cafe, size: 50),
-                        title: Text(name),
-                        subtitle: Text('$address\nStatus: $openNow'),
-                        onTap: () {
+                    final statusColor =
+                        openNow == 'Open Now' ? Colors.green : Colors.red;
+
+                    return GestureDetector(
+                      onTap: () {
+                        if (_currentPosition != null) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => MapScreen(
                                 destination: location,
+                                destinationname: name,
                               ),
                             ),
                           );
-                        },
+                        }
+                      },
+                      child: Card(
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 16.0),
+                        elevation: 5,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            photoReference != null
+                                ? FutureBuilder<String?>(
+                                    future: _getPhotoUrl(photoReference),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return SizedBox(
+                                          width: double.infinity,
+                                          height: 200,
+                                          child: Center(
+                                              child: CircularProgressIndicator()),
+                                        );
+                                      } else if (snapshot.hasData &&
+                                          snapshot.data != null) {
+                                        return Container(
+                                          width: double.infinity,
+                                          height: 200,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.vertical(
+                                                top: Radius.circular(8.0)),
+                                            image: DecorationImage(
+                                              image: NetworkImage(snapshot.data!),
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        );
+                                      } else {
+                                        return Container(
+                                          width: double.infinity,
+                                          height: 200,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[200],
+                                            borderRadius: BorderRadius.vertical(
+                                                top: Radius.circular(8.0)),
+                                          ),
+                                          child: Center(
+                                              child: Icon(Icons.local_cafe,
+                                                  size: 100)),
+                                        );
+                                      }
+                                    },
+                                  )
+                                : Container(
+                                    width: double.infinity,
+                                    height: 200,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[200],
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(8.0)),
+                                    ),
+                                    child: Center(
+                                        child: Icon(Icons.local_cafe, size: 100)),
+                                  ),
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(name,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold, fontSize: 18)),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 8.0),
+                              child: RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: '$address\nStatus: ',
+                                      style: TextStyle(
+                                          color: Colors.black),
+                                    ),
+                                    TextSpan(
+                                      text: openNow,
+                                      style: TextStyle(
+                                          color: statusColor),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },

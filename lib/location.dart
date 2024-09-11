@@ -6,8 +6,9 @@ import 'dart:convert';
 
 class MapScreen extends StatefulWidget {
   final LatLng? destination; // The location of the tapped cafe
+  final String? destinationname;
 
-  MapScreen({required this.destination});
+  MapScreen({required this.destination, this.destinationname});
 
   @override
   _MapScreenState createState() => _MapScreenState();
@@ -20,6 +21,7 @@ class _MapScreenState extends State<MapScreen> {
   String _error = '';
   Set<Polyline> _polylines = {};
   List<LatLng> _polylineCoordinates = [];
+  Set<Marker> _markers = {};
 
   @override
   void initState() {
@@ -37,6 +39,12 @@ class _MapScreenState extends State<MapScreen> {
       // Fetch the route from current location to the cafe
       if (widget.destination != null) {
         _getDirections(_currentPosition, widget.destination!);
+        _markers.add(Marker(
+            markerId: MarkerId('destination'),
+            position: widget.destination!,
+            infoWindow: InfoWindow(
+              title: widget.destinationname ?? 'Destination Cafe',
+            )));
       } else {
         // Handle the case where destination is null
         setState(() {
@@ -59,7 +67,7 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _getDirections(LatLng origin, LatLng destination) async {
-    final String apiKey = 'AIzaSyCN5iCJo4eq3UtebW1gvrdTN758Ul7rJO0'; // Replace with your API key
+    final String apiKey = 'AIzaSyCN5iCJo4eq3UtebW1gvrdTN758Ul7rJO0';
     final String url =
         'https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=$apiKey';
 
@@ -82,7 +90,7 @@ class _MapScreenState extends State<MapScreen> {
 
         mapController!.animateCamera(CameraUpdate.newLatLngBounds(
           _getLatLngBounds(_polylineCoordinates),
-          50.0, // Padding
+          50.0,
         ));
       }
     } else {
@@ -146,7 +154,7 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Map Route'),
+        title: Text('${widget.destinationname}'),
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
@@ -159,6 +167,7 @@ class _MapScreenState extends State<MapScreen> {
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
               polylines: _polylines,
+              markers: _markers,
             ),
     );
   }
