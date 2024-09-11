@@ -3,14 +3,14 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'location.dart'; 
+import 'location.dart';
 
-class CafeListWidget extends StatefulWidget {
+class RestaurantListWidget extends StatefulWidget {
   @override
-  _CafeListWidgetState createState() => _CafeListWidgetState();
+  _RestaurantListWidgetWidgetState createState() => _RestaurantListWidgetWidgetState();
 }
 
-class _CafeListWidgetState extends State<CafeListWidget> {
+class _RestaurantListWidgetWidgetState extends State<RestaurantListWidget> {
   bool _isLoading = true;
   String _error = '';
   List<dynamic> _cafes = [];
@@ -25,7 +25,7 @@ class _CafeListWidgetState extends State<CafeListWidget> {
         _currentPosition = LatLng(position.latitude, position.longitude);
         _isLoading = false;
       });
-      _fetchNearbyCafes();
+      _fetchNearbyRestaurants();
     }).catchError((e) {
       setState(() {
         _isLoading = false;
@@ -34,14 +34,14 @@ class _CafeListWidgetState extends State<CafeListWidget> {
     });
   }
 
-  Future<void> _fetchNearbyCafes() async {
+  Future<void> _fetchNearbyRestaurants() async {
     if (_currentPosition == null) return;
 
     final String url =
         'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
         '?location=${_currentPosition!.latitude},${_currentPosition!.longitude}'
         '&radius=3000'
-        '&type=cafe'
+        '&type=restaurant'
         '&key=$apiKey';
 
     try {
@@ -53,7 +53,7 @@ class _CafeListWidgetState extends State<CafeListWidget> {
         });
       } else {
         setState(() {
-          _error = 'Failed to fetch cafes';
+          _error = 'Failed to fetch restaurants';
         });
       }
     } catch (e) {
@@ -102,7 +102,7 @@ class _CafeListWidgetState extends State<CafeListWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cafés Around Me'),
+        title: Text('Restaurants Around Me'),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -127,8 +127,6 @@ class _CafeListWidgetState extends State<CafeListWidget> {
 
                     final statusColor =
                         openNow == 'Open Now' ? Colors.green : Colors.red;
-
-                    
 
                     return GestureDetector(
                       onTap: () {
@@ -191,7 +189,7 @@ class _CafeListWidgetState extends State<CafeListWidget> {
                                                     top: Radius.circular(8.0)),
                                           ),
                                           child: const Center(
-                                              child: Icon(Icons.local_cafe,
+                                              child: Icon(Icons.local_restaurant,
                                                   size: 100)),
                                         );
                                       }

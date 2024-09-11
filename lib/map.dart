@@ -4,24 +4,19 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class MapScreen extends StatefulWidget {
-  final LatLng? destination; // The location of the tapped cafe
-  final String? destinationname;
-
-  MapScreen({required this.destination, this.destinationname});
-
+class Map extends StatefulWidget {
   @override
   _MapScreenState createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _MapScreenState extends State<Map> {
   GoogleMapController? mapController;
   LatLng _currentPosition = LatLng(0.0, 0.0);
   bool _isLoading = true;
   String _error = '';
   Set<Polyline> _polylines = {};
-  List<LatLng> _polylineCoordinates = [];
   Set<Marker> _markers = {};
+  Marker? _destinationMarker;
 
   @override
   void initState() {
@@ -34,22 +29,6 @@ class _MapScreenState extends State<MapScreen> {
 
       if (mapController != null) {
         mapController!.animateCamera(CameraUpdate.newLatLng(_currentPosition));
-      }
-
-      // Fetch the route from current location to the cafe
-      if (widget.destination != null) {
-        _getDirections(_currentPosition, widget.destination!);
-        _markers.add(Marker(
-            markerId: MarkerId('destination'),
-            position: widget.destination!,
-            infoWindow: InfoWindow(
-              title: widget.destinationname ?? 'Destination Cafe',
-            )));
-      } else {
-        // Handle the case where destination is null
-        setState(() {
-          _error = 'Destination is not available';
-        });
       }
     }).catchError((e) {
       setState(() {
@@ -67,35 +46,46 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _getDirections(LatLng origin, LatLng destination) async {
-    final String apiKey = 'AIzaSyCN5iCJo4eq3UtebW1gvrdTN758Ul7rJO0';
+    final String apiKey = 'AIzaSyCN5iCJo4eq3UtebW1gvrdTN758Ul7rJO0'; // Replace with your actual API key
     final String url =
         'https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=$apiKey';
 
-    final response = await http.get(Uri.parse(url));
+    try {
+      final response = await http.get(Uri.parse(url));
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data['routes'].isNotEmpty) {
-        final points = data['routes'][0]['overview_polyline']['points'];
-        _polylineCoordinates = _decodePolyline(points);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['routes'].isNotEmpty) {
+          final points = data['routes'][0]['overview_polyline']['points'];
+          final polylineCoordinates = _decodePolyline(points);
 
-        setState(() {
-          _polylines.add(Polyline(
-            polylineId: PolylineId('route'),
-            points: _polylineCoordinates,
-            color: Colors.blue,
-            width: 5,
+          setState(() {
+            _polylines.clear();
+            _polylines.add(Polyline(
+              polylineId: PolylineId('route'),
+              points: polylineCoordinates,
+              color: Colors.blue,
+              width: 5,
+            ));
+          });
+
+          mapController!.animateCamera(CameraUpdate.newLatLngBounds(
+            _getLatLngBounds(polylineCoordinates),
+            50.0,
           ));
+        } else {
+          setState(() {
+            _error = 'No routes found';
+          });
+        }
+      } else {
+        setState(() {
+          _error = 'Failed to fetch directions: ${response.reasonPhrase}';
         });
-
-        mapController!.animateCamera(CameraUpdate.newLatLngBounds(
-          _getLatLngBounds(_polylineCoordinates),
-          50.0,
-        ));
       }
-    } else {
+    } catch (e) {
       setState(() {
-        _error = 'Failed to fetch directions';
+        _error = 'Error fetching directions: $e';
       });
     }
   }
@@ -150,25 +140,51 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
+  void _addDestinationMarker(LatLng position, String? name) {
+    setState(() {
+      _destinationMarker = Marker(
+        markerId: MarkerId('destination'),
+        position: position,
+        infoWindow: InfoWindow(
+          title: name ?? 'Destination',
+        ),
+      );
+      _markers.add(_destinationMarker!);
+    });
+
+    _getDirections(_currentPosition, position);
+  }
+
+  void _onMapTap(LatLng position) {
+    print('Map tapped at: $position'); // Debug print statement
+    setState(() {
+      _markers.removeWhere((marker) => marker.markerId.value == 'destination');
+      _addDestinationMarker(position, 'New Destination');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.destinationname ?? 'Map'}'),
+        title: Text('Map'),
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : GoogleMap(
-              onMapCreated: _onMapCreated,
-              initialCameraPosition: CameraPosition(
-                target: _currentPosition,
-                zoom: 14,
-              ),
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
-              polylines: _polylines,
-              markers: _markers,
-            ),
+          : _error.isNotEmpty
+              ? Center(child: Text('Error: $_error'))
+              : GoogleMap(
+                  onMapCreated: _onMapCreated,
+                  onTap: _onMapTap,
+                  initialCameraPosition: CameraPosition(
+                    target: _currentPosition,
+                    zoom: 14,
+                  ),
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: true,
+                  polylines: _polylines,
+                  markers: _markers,
+                ),
     );
   }
 
