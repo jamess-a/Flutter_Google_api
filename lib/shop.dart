@@ -5,16 +5,15 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'location.dart';
 
-class RestaurantListWidget extends StatefulWidget {
+class ShopListWidget extends StatefulWidget {
   @override
-  _RestaurantListWidgetWidgetState createState() =>
-      _RestaurantListWidgetWidgetState();
+  _ShopListWidgetWidgetState createState() => _ShopListWidgetWidgetState();
 }
 
-class _RestaurantListWidgetWidgetState extends State<RestaurantListWidget> {
+class _ShopListWidgetWidgetState extends State<ShopListWidget> {
   bool _isLoading = true;
   String _error = '';
-  List<dynamic> _cafes = [];
+  List<dynamic> _shops = [];
   LatLng? _currentPosition;
   final String apiKey = 'AIzaSyCN5iCJo4eq3UtebW1gvrdTN758Ul7rJO0';
 
@@ -42,7 +41,8 @@ class _RestaurantListWidgetWidgetState extends State<RestaurantListWidget> {
         'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
         '?location=${_currentPosition!.latitude},${_currentPosition!.longitude}'
         '&radius=3000'
-        '&type=restaurant'
+        '&type=convenience_store'
+        '&keyword=7-Eleven'
         '&key=$apiKey';
 
     try {
@@ -50,7 +50,7 @@ class _RestaurantListWidgetWidgetState extends State<RestaurantListWidget> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
-          _cafes = data['results'];
+          _shops = data['results'];
         });
       } else {
         setState(() {
@@ -101,31 +101,31 @@ class _RestaurantListWidgetWidgetState extends State<RestaurantListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    bool isDarkMode = ThemeData.dark().brightness == Brightness.dark;
-    Color Textcolor = isDarkMode ? Colors.black : Colors.white;
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    Color textColor = isDarkMode ? Colors.white : Colors.black;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Restaurants Around Me'),
+        title: Text('Convenience Stores Around Me'),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _error.isNotEmpty
               ? Center(child: Text('Error: $_error'))
               : ListView.builder(
-                  itemCount: _cafes.length,
+                  itemCount: _shops.length,
                   itemBuilder: (context, index) {
-                    final cafe = _cafes[index];
-                    final name = cafe['name'] ?? 'Unnamed';
-                    final address = cafe['vicinity'] ?? 'No address';
-                    final openNow = cafe['opening_hours']?['open_now'] == true
+                    final shop = _shops[index];
+                    final name = shop['name'] ?? 'Unnamed';
+                    final address = shop['vicinity'] ?? 'No address';
+                    final openNow = shop['opening_hours']?['open_now'] == true
                         ? 'Open Now'
                         : 'Closed';
                     final location = LatLng(
-                      cafe['geometry']['location']['lat'],
-                      cafe['geometry']['location']['lng'],
+                      shop['geometry']['location']['lat'],
+                      shop['geometry']['location']['lng'],
                     );
-                    final photoReference = cafe['photos'] != null
-                        ? cafe['photos'][0]['photo_reference']
+                    final photoReference = shop['photos'] != null
+                        ? shop['photos'][0]['photo_reference']
                         : null;
 
                     final statusColor =
@@ -193,7 +193,8 @@ class _RestaurantListWidgetWidgetState extends State<RestaurantListWidget> {
                                           ),
                                           child: const Center(
                                               child: Icon(
-                                                  Icons.local_restaurant,
+                                                  Icons
+                                                      .local_convenience_store_rounded,
                                                   size: 100)),
                                         );
                                       }
@@ -208,8 +209,10 @@ class _RestaurantListWidgetWidgetState extends State<RestaurantListWidget> {
                                           top: Radius.circular(8.0)),
                                     ),
                                     child: const Center(
-                                        child:
-                                            Icon(Icons.local_cafe, size: 100)),
+                                        child: Icon(
+                                            Icons
+                                                .local_convenience_store_rounded,
+                                            size: 100)),
                                   ),
                             Padding(
                               padding: const EdgeInsets.all(16.0),
@@ -226,8 +229,7 @@ class _RestaurantListWidgetWidgetState extends State<RestaurantListWidget> {
                                   children: [
                                     TextSpan(
                                       text: '$address\nStatus: ',
-                                      style:
-                                          TextStyle(color: Textcolor),
+                                      style: TextStyle(color: textColor),
                                     ),
                                     TextSpan(
                                       text: openNow,

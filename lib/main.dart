@@ -5,6 +5,7 @@ import 'cafe.dart';
 import 'map.dart';
 import 'restaurant.dart';
 import 'suggestion.dart';
+import 'shop.dart';
 
 void main() {
   runApp(const MyApp());
@@ -80,112 +81,157 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    Color textColor = isDarkMode ? Colors.white : Colors.black;
+
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-          title: Text(widget.title),
-          actions: [
-            Switch(
-              value: widget.isDarkMode,
-              onChanged: widget.onThemeChanged,
-              activeColor: Colors.white,
-            ),
-          ],
-        ),
-        body: Column(
-          children: [
-            Container(
-              margin: EdgeInsets.all(5),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                      child: ElevatedButton(
-                        onPressed: _openMapScreen,
-                        child: const Text('Open Map'),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(5),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CafeListWidget()),
-                          );
-                        },
-                        child: const Text('Café List'),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(5),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => RestaurantListWidget()),
-                          );
-                        },
-                        child: const Text('Restaurant List'),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(5),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CafeListWidget()),
-                          );
-                        },
-                        child: const Text('Shop List'),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-            Container(
-                margin: EdgeInsets.all(20),
-                child: Center(
-                  child: Card(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        const ListTile(
-                          leading: Icon(Icons.album),
-                          title: Text('The Enchanted Nightingale'),
-                          subtitle: Text(
-                              'Music by Julie Gable. Lyrics by Sidney Stein.'),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: <Widget>[
-                            TextButton(
-                              child: const Text('DIRECTION'),
-                              onPressed: () {/* ... */},
-                            ),
-                            const SizedBox(width: 8),
-                            TextButton(
-                              child: const Text('LISTEN'),
-                              onPressed: () {/* ... */},
-                            ),
-                            const SizedBox(width: 8),
-                          ],
-                        ),
-                      ],
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.secondary,
+        title: Text(widget.title),
+        actions: [
+          Switch(
+            value: widget.isDarkMode,
+            onChanged: widget.onThemeChanged,
+            activeColor: Colors.white,
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Container(
+            margin: EdgeInsets.all(5),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    child: ElevatedButton(
+                      onPressed: _openMapScreen,
+                      child: const Text('Open Map'),
                     ),
                   ),
-                )),
-            Expanded(
-              child: SuggestionWidget(),
+                  Container(
+                    margin: EdgeInsets.all(5),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CafeListWidget()),
+                        );
+                      },
+                      child: const Text('Café List'),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(5),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RestaurantListWidget()),
+                        );
+                      },
+                      child: const Text('Restaurant List'),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(5),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ShopListWidget()),
+                        );
+                      },
+                      child: const Text('Shop List'),
+                    ),
+                  )
+                ],
+              ),
             ),
-          ],
-        ));
+          ),
+          Container(
+            height: 150,
+            margin: EdgeInsets.all(5),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    width: 300,
+                    child: Card(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          ListTile(
+                            leading: Icon(Icons.home, color: textColor),
+                            title: Text(
+                              'Home',
+                              style: TextStyle(color: textColor),
+                            ),
+                            subtitle: Text(
+                              'Day off is waiting for you! GO home now.',
+                              style: TextStyle(color: textColor),
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              TextButton(
+                                child: const Text('DIRECTION'),
+                                onPressed: () {/* ... */},
+                              ),
+                              const SizedBox(width: 8),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 300,
+                    child: Card(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          ListTile(
+                            leading: Icon(Icons.work_history, color: textColor),
+                            title: Text(
+                              'Digio',
+                              style: TextStyle(color: textColor),
+                            ),
+                            subtitle: Text(
+                              'Back to work. your boss is waiting for you! GO now.',
+                              style: TextStyle(color: textColor),
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              TextButton(
+                                child: const Text('DIRECTION'),
+                                onPressed: () {},
+                              ),
+                              const SizedBox(width: 8),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: SuggestionWidget(),
+          ),
+        ],
+      ),
+    );
   }
 }

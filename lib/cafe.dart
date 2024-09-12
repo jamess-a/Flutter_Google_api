@@ -3,7 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'location.dart'; 
+import 'location.dart';
 
 class CafeListWidget extends StatefulWidget {
   @override
@@ -100,6 +100,8 @@ class _CafeListWidgetState extends State<CafeListWidget> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    Color textColor = isDarkMode ? Colors.white : Colors.black;
     return Scaffold(
       appBar: AppBar(
         title: Text('Cafés Around Me'),
@@ -127,8 +129,6 @@ class _CafeListWidgetState extends State<CafeListWidget> {
 
                     final statusColor =
                         openNow == 'Open Now' ? Colors.green : Colors.red;
-
-                    
 
                     return GestureDetector(
                       onTap: () {
@@ -224,8 +224,7 @@ class _CafeListWidgetState extends State<CafeListWidget> {
                                   children: [
                                     TextSpan(
                                       text: '$address\nStatus: ',
-                                      style:
-                                          const TextStyle(color: Colors.black),
+                                      style: TextStyle(color: textColor),
                                     ),
                                     TextSpan(
                                       text: openNow,

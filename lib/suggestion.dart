@@ -132,41 +132,54 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             ListTile(
-              leading: Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  image:
-                      restaurant.photos != null && restaurant.photos!.isNotEmpty
-                          ? DecorationImage(
-                              image: NetworkImage(
-                                "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${restaurant.photos![0].photoReference}&key=$apiKey",
-                              ),
-                              fit: BoxFit.cover,
-                            )
-                          : null,
-                ),
-                child: restaurant.photos == null || restaurant.photos!.isEmpty
-                    ? Icon(Icons.restaurant, size: 40)
-                    : null,
-              ),
-              title: Text(
-                restaurant.name ?? 'Restaurant',
-                style: GoogleFonts.lato(
-                  textStyle: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (restaurant.photos != null &&
+                      restaurant.photos!.isNotEmpty)
+                    Container(
+                      width: double.infinity,
+                      height: 150, 
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        image: DecorationImage(
+                          image: NetworkImage(
+                            "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${restaurant.photos![0].photoReference}&key=$apiKey",
+                          ),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    )
+                  else
+                    Container(
+                      width: double.infinity,
+                      height: 150, // Adjust the height as needed
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey,
+                      ),
+                      child: const Icon(Icons.restaurant,
+                          size: 100, color: Colors.white),
+                    ),
+                  const SizedBox(height: 10),
+                  Text(
+                    restaurant.name ?? 'Restaurant',
+                    style: GoogleFonts.lato(
+                      textStyle: const TextStyle(
+                        fontSize: 24, // Increased font size
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 5),
+                  const SizedBox(height: 5),
                   RatingBarIndicator(
                     rating: restaurant.rating?.toDouble() ?? 0.0,
-                    itemBuilder: (context, index) => Icon(
+                    itemBuilder: (context, index) => const Icon(
                       Icons.star,
                       color: Colors.amber,
                     ),
@@ -178,7 +191,7 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
                     Text(
                       'Address: ${restaurant.vicinity!}',
                       style: GoogleFonts.lato(
-                        textStyle: TextStyle(fontSize: 16),
+                        textStyle: const TextStyle(fontSize: 16),
                       ),
                     ),
                 ],
@@ -209,7 +222,7 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
                       );
                     }
                   },
-                  icon: Icon(Icons.directions),
+                  icon: const Icon(Icons.directions),
                   label: const Text('DIRECTION'),
                 ),
                 const SizedBox(width: 8),
