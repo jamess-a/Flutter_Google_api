@@ -6,6 +6,7 @@ import 'map.dart';
 import 'restaurant.dart';
 import 'suggestion.dart';
 import 'shop.dart';
+import 'scroller.dart';
 
 void main() {
   runApp(const MyApp());
@@ -86,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.secondary,
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
         actions: [
           Switch(
@@ -155,77 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Container(
-            height: 150,
-            margin: EdgeInsets.all(5),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    width: 300,
-                    child: Card(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          ListTile(
-                            leading: Icon(Icons.home, color: textColor),
-                            title: Text(
-                              'Home',
-                              style: TextStyle(color: textColor),
-                            ),
-                            subtitle: Text(
-                              'Day off is waiting for you! GO home now.',
-                              style: TextStyle(color: textColor),
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              TextButton(
-                                child: const Text('DIRECTION'),
-                                onPressed: () {/* ... */},
-                              ),
-                              const SizedBox(width: 8),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: 300,
-                    child: Card(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          ListTile(
-                            leading: Icon(Icons.work_history, color: textColor),
-                            title: Text(
-                              'Digio',
-                              style: TextStyle(color: textColor),
-                            ),
-                            subtitle: Text(
-                              'Back to work. your boss is waiting for you! GO now.',
-                              style: TextStyle(color: textColor),
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              TextButton(
-                                child: const Text('DIRECTION'),
-                                onPressed: () {},
-                              ),
-                              const SizedBox(width: 8),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
+            child: ScrollerWidget(),
           ),
           Expanded(
             child: SuggestionWidget(),
