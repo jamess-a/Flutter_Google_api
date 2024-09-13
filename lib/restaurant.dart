@@ -101,8 +101,8 @@ class _RestaurantListWidgetWidgetState extends State<RestaurantListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    bool isDarkMode = ThemeData.dark().brightness == Brightness.dark;
-    Color Textcolor = isDarkMode ? Colors.black : Colors.white;
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    Color textColor = isDarkMode ? Colors.white : Colors.black;
     return Scaffold(
       appBar: AppBar(
         title: Text('Restaurants Around Me'),
@@ -227,7 +227,7 @@ class _RestaurantListWidgetWidgetState extends State<RestaurantListWidget> {
                                     TextSpan(
                                       text: '$address\nStatus: ',
                                       style:
-                                          TextStyle(color: Textcolor),
+                                          TextStyle(color: textColor),
                                     ),
                                     TextSpan(
                                       text: openNow,

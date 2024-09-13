@@ -36,7 +36,7 @@ class _MapScreenState extends State<MapScreen> {
         mapController!.animateCamera(CameraUpdate.newLatLng(_currentPosition));
       }
 
-      // Fetch the route from current location to the cafe
+      
       if (widget.destination != null) {
         _getDirections(_currentPosition, widget.destination!);
         _markers.add(Marker(
@@ -46,7 +46,7 @@ class _MapScreenState extends State<MapScreen> {
               title: widget.destinationname ?? 'Destination Cafe',
             )));
       } else {
-        // Handle the case where destination is null
+        
         setState(() {
           _error = 'Destination is not available';
         });

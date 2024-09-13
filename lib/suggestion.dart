@@ -45,7 +45,7 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
     var result = await googlePlace.search.getNearBySearch(
       Location(
           lat: _currentPosition!.latitude, lng: _currentPosition!.longitude),
-      1500,
+      10000,
       type: 'restaurant',
     );
     print('API ${result?.results}');

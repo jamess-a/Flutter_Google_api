@@ -7,6 +7,7 @@ import 'restaurant.dart';
 import 'suggestion.dart';
 import 'shop.dart';
 import 'scroller.dart';
+import 'Lab/map.dart';
 
 void main() {
   runApp(const MyApp());
@@ -74,8 +75,8 @@ class _MyHomePageState extends State<MyHomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => MapScreen(
-                destination: LatLng(0.0, 0.0),
+          builder: (context) => const MapMyHomePage(
+                title: 'Map',
               )),
     );
   }
@@ -158,7 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Container(
             child: ScrollerWidget(),
           ),
-          Expanded(
+          const Expanded(
             child: SuggestionWidget(),
           ),
         ],
