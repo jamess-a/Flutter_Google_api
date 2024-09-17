@@ -4,7 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'fav.dart';
+import 'fav_cafe.dart';
 import 'location.dart';
 
 class CafeListWidget extends StatefulWidget {
@@ -133,6 +133,7 @@ class _CafeListWidgetState extends State<CafeListWidget> {
         actions: [
           IconButton(
             icon: Icon(Icons.favorite),
+            color: Colors.red,
             onPressed: () {
               Navigator.push(
                 context,

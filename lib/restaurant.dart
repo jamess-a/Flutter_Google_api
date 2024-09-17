@@ -3,7 +3,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'location.dart';
+import 'fav_res.dart';
 
 class RestaurantListWidget extends StatefulWidget {
   @override
@@ -16,11 +18,14 @@ class _RestaurantListWidgetWidgetState extends State<RestaurantListWidget> {
   String _error = '';
   List<dynamic> _cafes = [];
   LatLng? _currentPosition;
+  Set<String> _favorites = Set<String>();
   final String apiKey = 'AIzaSyCN5iCJo4eq3UtebW1gvrdTN758Ul7rJO0';
+  get isFavorite => null;
 
   @override
   void initState() {
     super.initState();
+    _loadFavorites();
     _getCurrentPosition().then((position) {
       setState(() {
         _currentPosition = LatLng(position.latitude, position.longitude);
@@ -33,6 +38,27 @@ class _RestaurantListWidgetWidgetState extends State<RestaurantListWidget> {
         _error = e.toString();
       });
     });
+  }
+
+  Future<void> _loadFavorites() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _favorites = prefs.getStringList('restaruant_favorites')?.toSet() ??
+            Set<String>();
+      });
+    } catch (e) {
+      print('Error loading favorites: $e');
+    }
+  }
+
+  Future<void> _saveFavorites() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('restaruant_favorites', _favorites.toList());
+    } catch (e) {
+      print('Error saving favorites: $e');
+    }
   }
 
   Future<void> _fetchNearbyRestaurants() async {
@@ -106,6 +132,20 @@ class _RestaurantListWidgetWidgetState extends State<RestaurantListWidget> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Restaurants Around Me'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.favorite),
+            color: Colors.red,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FavListRes(favorites: _favorites),
+                ),
+              );
+            },
+          ),
+        ]
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -130,6 +170,8 @@ class _RestaurantListWidgetWidgetState extends State<RestaurantListWidget> {
 
                     final statusColor =
                         openNow == 'Open Now' ? Colors.green : Colors.red;
+
+                    final isFavorite = _favorites.contains(name);
 
                     return GestureDetector(
                       onTap: () {
@@ -226,14 +268,54 @@ class _RestaurantListWidgetWidgetState extends State<RestaurantListWidget> {
                                   children: [
                                     TextSpan(
                                       text: '$address\nStatus: ',
-                                      style:
-                                          TextStyle(color: textColor),
+                                      style: TextStyle(color: textColor),
                                     ),
                                     TextSpan(
                                       text: openNow,
                                       style: TextStyle(color: statusColor),
                                     ),
                                   ],
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 16.0, bottom: 8.0),
+                              child: Align(
+                                alignment: Alignment.bottomRight,
+                                child: IconButton(
+                                  icon: Icon(
+                                    isFavorite
+                                        ? Icons.favorite
+                                        : Icons.favorite_border,
+                                    color: isFavorite ? Colors.red : null,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      if (isFavorite) {
+                                        _favorites.remove(name);
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                '$name removed from favorites'),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      } else {
+                                        _favorites.add(name);
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                '$name added to favorites'),
+                                            backgroundColor: Colors.green,
+                                          ),
+                                        );
+                                      }
+                                      _saveFavorites();
+                                    });
+                                  },
                                 ),
                               ),
                             ),

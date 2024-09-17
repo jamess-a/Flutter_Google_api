@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'location.dart';
+import 'fav_shop.dart';
 
 class ShopListWidget extends StatefulWidget {
   @override
@@ -11,15 +13,18 @@ class ShopListWidget extends StatefulWidget {
 }
 
 class _ShopListWidgetWidgetState extends State<ShopListWidget> {
+  Set<String> _favorites = Set<String>();
   bool _isLoading = true;
   String _error = '';
   List<dynamic> _shops = [];
   LatLng? _currentPosition;
   final String apiKey = 'AIzaSyCN5iCJo4eq3UtebW1gvrdTN758Ul7rJO0';
+  get isFavorite => null;
 
   @override
   void initState() {
     super.initState();
+    _loadFavorites();
     _getCurrentPosition().then((position) {
       setState(() {
         _currentPosition = LatLng(position.latitude, position.longitude);
@@ -32,6 +37,27 @@ class _ShopListWidgetWidgetState extends State<ShopListWidget> {
         _error = e.toString();
       });
     });
+  }
+
+  Future<void> _loadFavorites() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _favorites =
+            prefs.getStringList('shop_favorites')?.toSet() ?? Set<String>();
+      });
+    } catch (e) {
+      print('Error loading favorites: $e');
+    }
+  }
+
+  Future<void> _saveFavorites() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('shop_favorites', _favorites.toList());
+    } catch (e) {
+      print('Error saving favorites: $e');
+    }
   }
 
   Future<void> _fetchNearbyRestaurants() async {
@@ -104,9 +130,20 @@ class _ShopListWidgetWidgetState extends State<ShopListWidget> {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     Color textColor = isDarkMode ? Colors.white : Colors.black;
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Convenience Stores Around Me'),
-      ),
+      appBar: AppBar(title: Text('Stores Around Me'), actions: [
+        IconButton(
+          icon: Icon(Icons.favorite),
+          color: Colors.red,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FavListShop(favorites: _favorites),
+              ),
+            );
+          },
+        ),
+      ]),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _error.isNotEmpty
@@ -130,6 +167,8 @@ class _ShopListWidgetWidgetState extends State<ShopListWidget> {
 
                     final statusColor =
                         openNow == 'Open Now' ? Colors.green : Colors.red;
+
+                    final isFavorite = _favorites.contains(name);
 
                     return GestureDetector(
                       onTap: () {
@@ -236,6 +275,47 @@ class _ShopListWidgetWidgetState extends State<ShopListWidget> {
                                       style: TextStyle(color: statusColor),
                                     ),
                                   ],
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 16.0, bottom: 8.0),
+                              child: Align(
+                                alignment: Alignment.bottomRight,
+                                child: IconButton(
+                                  icon: Icon(
+                                    isFavorite
+                                        ? Icons.favorite
+                                        : Icons.favorite_border,
+                                    color: isFavorite ? Colors.red : null,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      if (isFavorite) {
+                                        _favorites.remove(name);
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                '$name removed from favorites'),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      } else {
+                                        _favorites.add(name);
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                '$name added to favorites'),
+                                            backgroundColor: Colors.green,
+                                          ),
+                                        );
+                                      }
+                                      _saveFavorites();
+                                    });
+                                  },
                                 ),
                               ),
                             ),

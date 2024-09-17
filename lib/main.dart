@@ -8,7 +8,7 @@ import 'restaurant.dart';
 import 'suggestion.dart';
 import 'shop.dart';
 import 'scroller.dart';
-import 'fav.dart';
+import 'fav_cafe.dart';
 import 'BottomSheetMenu.dart';
 import 'Lab/map.dart';
 
