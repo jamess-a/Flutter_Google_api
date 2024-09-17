@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'location.dart';
 import 'cafe.dart';
 import 'map.dart';
@@ -7,6 +8,8 @@ import 'restaurant.dart';
 import 'suggestion.dart';
 import 'shop.dart';
 import 'scroller.dart';
+import 'fav.dart';
+import 'BottomSheetMenu.dart';
 import 'Lab/map.dart';
 
 void main() {
@@ -71,6 +74,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Set<String> _favorites = Set<String>();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   void _openMapScreen() {
     Navigator.push(
       context,
@@ -98,6 +108,18 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return const Bottomsheetmenu();
+            },
+          );
+        },
+        child: Icon(Icons.menu),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: Column(
         children: [
           Container(

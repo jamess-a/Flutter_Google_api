@@ -156,7 +156,7 @@ class _MapScreenState extends State<Map> {
   }
 
   void _onMapTap(LatLng position) {
-    print('Map tapped at: $position'); // Debug print statement
+    print('Map tapped at: $position'); 
     setState(() {
       _markers.removeWhere((marker) => marker.markerId.value == 'destination');
       _addDestinationMarker(position, 'New Destination');

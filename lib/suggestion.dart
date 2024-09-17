@@ -153,7 +153,7 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
                   else
                     Container(
                       width: double.infinity,
-                      height: 150, // Adjust the height as needed
+                      height: 150, 
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.grey,

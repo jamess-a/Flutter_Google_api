@@ -3,6 +3,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'fav.dart';
 import 'location.dart';
 
 class CafeListWidget extends StatefulWidget {
@@ -14,12 +16,14 @@ class _CafeListWidgetState extends State<CafeListWidget> {
   bool _isLoading = true;
   String _error = '';
   List<dynamic> _cafes = [];
+  Set<String> _favorites = Set<String>();
   LatLng? _currentPosition;
   final String apiKey = 'AIzaSyCN5iCJo4eq3UtebW1gvrdTN758Ul7rJO0';
 
   @override
   void initState() {
     super.initState();
+    _loadFavorites();
     _getCurrentPosition().then((position) {
       setState(() {
         _currentPosition = LatLng(position.latitude, position.longitude);
@@ -34,13 +38,33 @@ class _CafeListWidgetState extends State<CafeListWidget> {
     });
   }
 
+  Future<void> _loadFavorites() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _favorites = prefs.getStringList('favorites')?.toSet() ?? Set<String>();
+      });
+    } catch (e) {
+      print('Error loading favorites: $e');
+    }
+  }
+
+  Future<void> _saveFavorites() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('favorites', _favorites.toList());
+    } catch (e) {
+      print('Error saving favorites: $e');
+    }
+  }
+
   Future<void> _fetchNearbyCafes() async {
     if (_currentPosition == null) return;
 
     final String url =
         'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
         '?location=${_currentPosition!.latitude},${_currentPosition!.longitude}'
-        '&radius=3000'
+        '&radius=10000'
         '&type=cafe'
         '&key=$apiKey';
 
@@ -102,9 +126,23 @@ class _CafeListWidgetState extends State<CafeListWidget> {
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     Color textColor = isDarkMode ? Colors.white : Colors.black;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Cafés Around Me'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.favorite),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FavList(favorites: _favorites),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -129,6 +167,8 @@ class _CafeListWidgetState extends State<CafeListWidget> {
 
                     final statusColor =
                         openNow == 'Open Now' ? Colors.green : Colors.red;
+
+                    final isFavorite = _favorites.contains(name);
 
                     return GestureDetector(
                       onTap: () {
@@ -231,6 +271,47 @@ class _CafeListWidgetState extends State<CafeListWidget> {
                                       style: TextStyle(color: statusColor),
                                     ),
                                   ],
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 16.0, bottom: 8.0),
+                              child: Align(
+                                alignment: Alignment.bottomRight,
+                                child: IconButton(
+                                  icon: Icon(
+                                    isFavorite
+                                        ? Icons.favorite
+                                        : Icons.favorite_border,
+                                    color: isFavorite ? Colors.red : null,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      if (isFavorite) {
+                                        _favorites.remove(name);
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                '$name removed from favorites'),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      } else {
+                                        _favorites.add(name);
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                '$name added to favorites'),
+                                            backgroundColor: Colors.green,
+                                          ),
+                                        );
+                                      }
+                                      _saveFavorites();
+                                    });
+                                  },
                                 ),
                               ),
                             ),
