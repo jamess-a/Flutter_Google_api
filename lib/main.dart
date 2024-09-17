@@ -35,7 +35,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'What to eat',
+      title: 'After You!',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
             seedColor: const Color.fromARGB(255, 0, 225, 255)),
@@ -49,7 +49,7 @@ class _MyAppState extends State<MyApp> {
       ),
       themeMode: _themeMode,
       home: MyHomePage(
-        title: 'What-to-eat',
+        title: 'After You! - Home',
         onThemeChanged: _toggleTheme,
         isDarkMode: _themeMode == ThemeMode.dark,
       ),

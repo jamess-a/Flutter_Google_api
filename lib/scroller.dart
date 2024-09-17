@@ -17,7 +17,7 @@ class _ScrollerWidgetState extends State<ScrollerWidget> {
 
     return Container(
       height: 150,
-      margin: EdgeInsets.all(5),
+      margin: EdgeInsets.all(2),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -26,7 +26,7 @@ class _ScrollerWidgetState extends State<ScrollerWidget> {
               width: 300,
               child: Card(
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
                     ListTile(
                       leading: Icon(Icons.home, color: textColor),
@@ -57,7 +57,7 @@ class _ScrollerWidgetState extends State<ScrollerWidget> {
               width: 300,
               child: Card(
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
                     ListTile(
                       leading: Icon(Icons.work_history, color: textColor),
@@ -88,7 +88,7 @@ class _ScrollerWidgetState extends State<ScrollerWidget> {
               width: 300,
               child: Card(
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
                     ListTile(
                       leading: Icon(Icons.local_convenience_store_rounded,
