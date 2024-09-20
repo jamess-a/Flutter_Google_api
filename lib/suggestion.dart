@@ -20,6 +20,7 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
   List<SearchResult>? restaurantSuggestions;
   final String apiKey = 'AIzaSyCN5iCJo4eq3UtebW1gvrdTN758Ul7rJO0';
   LatLng? _currentPosition;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -90,28 +91,35 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Restaurant Suggestions'),
-      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _error.isNotEmpty
               ? Center(child: Text('Error: $_error'))
               : restaurantSuggestions == null || restaurantSuggestions!.isEmpty
                   ? const Center(child: Text('No restaurants found.'))
-                  : SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          ListView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: restaurantSuggestions!.length < 3
-                                ? restaurantSuggestions!.length
-                                : 3,
-                            itemBuilder: (context, index) {
-                              final restaurant = restaurantSuggestions![index];
-                              return _buildRestaurantCard(restaurant);
-                            },
+                  : Scrollbar(
+                      controller: _scrollController,
+                      thumbVisibility: true,
+                      child: CustomScrollView(
+                        controller: _scrollController,
+                        slivers: [
+                          SliverAppBar(
+                            floating: true,
+                            pinned: true,
+                            snap: true,
+                            title: Text('Restaurant Suggestions'),
+                          ),
+                          SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
+                                final restaurant =
+                                    restaurantSuggestions![index];
+                                return _buildRestaurantCard(restaurant);
+                              },
+                              childCount: restaurantSuggestions!.length < 5
+                                  ? restaurantSuggestions!.length
+                                  : 5,
+                            ),
                           ),
                         ],
                       ),
@@ -139,7 +147,7 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
                       restaurant.photos!.isNotEmpty)
                     Container(
                       width: double.infinity,
-                      height: 150, 
+                      height: 150,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         image: DecorationImage(
@@ -153,7 +161,7 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
                   else
                     Container(
                       width: double.infinity,
-                      height: 150, 
+                      height: 150,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.grey,
@@ -216,7 +224,8 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
                             destination: LatLng(
                                 restaurant.geometry!.location!.lat!,
                                 restaurant.geometry!.location!.lng!),
-                            destinationname: restaurant.name ?? 'Restaurant',
+                            destinationname:
+                                restaurant.name ?? 'Restaurant',
                           ),
                         ),
                       );

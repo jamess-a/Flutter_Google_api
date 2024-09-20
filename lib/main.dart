@@ -91,10 +91,45 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Future<void> _showMyDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('AlertDialog Title'),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('This is a demo alert dialog.'),
+                Text('Would you like to approve of this message?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Approve'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     Color textColor = isDarkMode ? Colors.white : Colors.black;
+    Color containerColor = isDarkMode ? Colors.grey : Colors.white;
 
     return Scaffold(
       appBar: AppBar(
@@ -120,71 +155,110 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Icon(Icons.menu),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      body: Column(
-        children: [
-          Container(
-            margin: EdgeInsets.all(5),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    child: ElevatedButton(
-                      onPressed: _openMapScreen,
-                      child: const Text('Open Map'),
-                    ),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: Column(
+            children: [
+              Container(
+                margin: EdgeInsets.all(5),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                        child: ElevatedButton(
+                          onPressed: _openMapScreen,
+                          child: const Text('Open Map'),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.all(5),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => CafeListWidget()),
+                            );
+                          },
+                          child: const Text('Café List'),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.all(5),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RestaurantListWidget()),
+                            );
+                          },
+                          child: const Text('Restaurant List'),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.all(5),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ShopListWidget()),
+                            );
+                          },
+                          child: const Text('Shop List'),
+                        ),
+                      )
+                    ],
                   ),
-                  Container(
-                    margin: EdgeInsets.all(5),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => CafeListWidget()),
-                        );
-                      },
-                      child: const Text('Café List'),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.all(5),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => RestaurantListWidget()),
-                        );
-                      },
-                      child: const Text('Restaurant List'),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.all(5),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ShopListWidget()),
-                        );
-                      },
-                      child: const Text('Shop List'),
-                    ),
-                  )
-                ],
+                ),
               ),
-            ),
+              Container(
+                child: ScrollerWidget(),
+              ),
+              Container(
+                height: 500,
+                child: SuggestionWidget(),
+              ),
+              Container(
+                  height: 150,
+                  child: GestureDetector(
+                    onLongPress: () { _showMyDialog();},
+                    onTap: () {
+                      _showMyDialog();
+                    },
+                    child: Card(
+                      margin: EdgeInsets.only(bottom: 10, left: 5, right: 5),
+                      elevation: 5,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          const ListTile(
+                            leading: Icon(Icons.fastfood),
+                            title: Text('Ramdom Meal ! Now ..'),
+                            subtitle: Text(
+                                'Dont know what meal is waiting for you! GO get it now!'),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              TextButton(
+                                child: Text('Ramdom Details'),
+                                onPressed: () {},
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  )),
+            ],
           ),
-          Container(
-            child: ScrollerWidget(),
-          ),
-          const Expanded(
-            child: SuggestionWidget(),
-          ),
-        ],
+        ),
       ),
     );
   }
