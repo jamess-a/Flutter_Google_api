@@ -300,8 +300,7 @@ class _CafeListWidgetState extends State<CafeListWidget> {
                                   ),
                                   const Spacer(),
                                   Padding(
-                                    padding: const EdgeInsets.only(
-                                        right: 16.0, bottom: 8.0),
+                                    padding: const EdgeInsets.only(bottom: 8.0),
                                     child: Align(
                                       alignment: Alignment.bottomRight,
                                       child: IconButton(

@@ -49,7 +49,7 @@ class _MyAppState extends State<MyApp> {
       ),
       themeMode: _themeMode,
       home: MyHomePage(
-        title: 'After You! - Home',
+        title: 'After You!',
         onThemeChanged: _toggleTheme,
         isDarkMode: _themeMode == ThemeMode.dark,
       ),
@@ -158,9 +158,28 @@ class _MyHomePageState extends State<MyHomePage> {
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: SizedBox(
-          height: MediaQuery.of(context).size.height,
+          height: MediaQuery.of(context).size.height * 1.1,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Row(
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(top: 10, left: 21),
+                    child: Icon(Icons.location_on),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 10, left: 21),
+                    child: Text(
+                      'Find Your Place around You !!',
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               Container(
                 margin: EdgeInsets.all(5),
                 child: SingleChildScrollView(
@@ -169,13 +188,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Container(
+                        margin: EdgeInsets.all(4),
                         child: ElevatedButton(
                           onPressed: _openMapScreen,
                           child: const Text('Open Map'),
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.all(5),
+                        margin: EdgeInsets.all(4),
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.push(
@@ -188,7 +208,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.all(5),
+                        margin: EdgeInsets.all(4),
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.push(
@@ -201,7 +221,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.all(5),
+                        margin: EdgeInsets.all(4),
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.push(
@@ -227,7 +247,9 @@ class _MyHomePageState extends State<MyHomePage> {
               Container(
                   height: 150,
                   child: GestureDetector(
-                    onLongPress: () { _showMyDialog();},
+                    onLongPress: () {
+                      _showMyDialog();
+                    },
                     onTap: () {
                       _showMyDialog();
                     },

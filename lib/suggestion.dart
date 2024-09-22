@@ -17,7 +17,7 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
   bool _isLoading = true;
   String _error = '';
   late GooglePlace googlePlace;
-  List<SearchResult>? restaurantSuggestions;
+  List<SearchResult>? suggestions = [];
   final String apiKey = 'AIzaSyCN5iCJo4eq3UtebW1gvrdTN758Ul7rJO0';
   LatLng? _currentPosition;
   final ScrollController _scrollController = ScrollController();
@@ -30,7 +30,7 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
         _currentPosition = LatLng(position.latitude, position.longitude);
         _isLoading = false;
       });
-      fetchRestaurantSuggestions();
+      fetchCafeSuggestions();
     }).catchError((e) {
       setState(() {
         _isLoading = false;
@@ -40,25 +40,41 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
     googlePlace = GooglePlace(apiKey);
   }
 
-  Future<void> fetchRestaurantSuggestions() async {
+  List<String> suggestionsCafe = [
+    'Yellow Pumpkin',
+    'La-Moon Café',
+    'de Forest Cafe & Bakery',
+    'Fika Café',
+    'SEPT CAFE'
+  ];
+
+  Future<void> fetchCafeSuggestions() async {
     if (_currentPosition == null) return;
 
     var result = await googlePlace.search.getNearBySearch(
       Location(
           lat: _currentPosition!.latitude, lng: _currentPosition!.longitude),
       10000,
-      type: 'restaurant',
-    );
-    print('API ${result?.results}');
+      type: 'cafe',
+      name: 'yellow pumpkin , La-Moon Café , de Forest Cafe & Bakery , SEPT CAFE , Fika Café',
+    ); 
 
-    if (result != null && result.results != null) {
-      setState(() {
-        restaurantSuggestions = result.results;
+    if (result != null &&
+        result.results != null &&
+        result.results!.isNotEmpty) {
+      var results = result.results!;
+      results.sort((a, b) {
+        double ratingA = a.rating ?? 0.0;
+        double ratingB = b.rating ?? 0.0;
+        return ratingB.compareTo(ratingA);
       });
+
+      suggestions = results.take(5).toList();
+
+      setState(() {});
     } else {
-      setState(() {
-        restaurantSuggestions = [];
-      });
+      _error = 'No cafes found';
+      setState(() {});
     }
   }
 
@@ -95,8 +111,8 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
           ? const Center(child: CircularProgressIndicator())
           : _error.isNotEmpty
               ? Center(child: Text('Error: $_error'))
-              : restaurantSuggestions == null || restaurantSuggestions!.isEmpty
-                  ? const Center(child: Text('No restaurants found.'))
+              : suggestions == null || suggestions!.isEmpty
+                  ? const Center(child: Text('No cafes found.'))
                   : Scrollbar(
                       controller: _scrollController,
                       thumbVisibility: true,
@@ -107,17 +123,16 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
                             floating: true,
                             pinned: true,
                             snap: true,
-                            title: Text('Restaurant Suggestions'),
+                            title: Text('Café Suggestions'),
                           ),
                           SliverList(
                             delegate: SliverChildBuilderDelegate(
                               (context, index) {
-                                final restaurant =
-                                    restaurantSuggestions![index];
-                                return _buildRestaurantCard(restaurant);
+                                final cafe = suggestions![index];
+                                return _buildCard(cafe);
                               },
-                              childCount: restaurantSuggestions!.length < 5
-                                  ? restaurantSuggestions!.length
+                              childCount: suggestions!.length < 5
+                                  ? suggestions!.length
                                   : 5,
                             ),
                           ),
@@ -127,7 +142,7 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
     );
   }
 
-  Widget _buildRestaurantCard(SearchResult restaurant) {
+  Widget _buildCard(SearchResult cafe) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       elevation: 5,
@@ -141,7 +156,7 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (restaurant.photos != null && restaurant.photos!.isNotEmpty)
+                if (cafe.photos != null && cafe.photos!.isNotEmpty)
                   Container(
                     width: 800,
                     height: 200,
@@ -149,7 +164,7 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
                       borderRadius: BorderRadius.circular(10),
                       image: DecorationImage(
                         image: NetworkImage(
-                          "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${restaurant.photos![0].photoReference}&key=$apiKey",
+                          "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${cafe.photos![0].photoReference}&key=$apiKey",
                         ),
                         fit: BoxFit.cover,
                       ),
@@ -168,10 +183,10 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
                   ),
                 const SizedBox(height: 10),
                 Text(
-                  restaurant.name ?? 'Restaurant',
+                  cafe.name ?? 'Cafe',
                   style: GoogleFonts.lato(
                     textStyle: const TextStyle(
-                      fontSize: 24, 
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -183,7 +198,7 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
               children: [
                 const SizedBox(height: 5),
                 RatingBarIndicator(
-                  rating: restaurant.rating?.toDouble() ?? 0.0,
+                  rating: cafe.rating?.toDouble() ?? 0.0,
                   itemBuilder: (context, index) => const Icon(
                     Icons.star,
                     color: Colors.amber,
@@ -192,9 +207,9 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
                   itemSize: 20.0,
                   direction: Axis.horizontal,
                 ),
-                if (restaurant.vicinity != null)
+                if (cafe.vicinity != null)
                   Text(
-                    'Address: ${restaurant.vicinity!}',
+                    'Address: ${cafe.vicinity!}',
                     style: GoogleFonts.lato(
                       textStyle: const TextStyle(fontSize: 16),
                     ),
@@ -213,15 +228,14 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
                 ),
                 onPressed: () {
                   if (_currentPosition != null &&
-                      restaurant.geometry?.location != null) {
+                      cafe.geometry?.location != null) {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => MapScreen(
-                          destination: LatLng(
-                              restaurant.geometry!.location!.lat!,
-                              restaurant.geometry!.location!.lng!),
-                          destinationname: restaurant.name ?? 'Restaurant',
+                          destination: LatLng(cafe.geometry!.location!.lat!,
+                              cafe.geometry!.location!.lng!),
+                          destinationname: cafe.name ?? 'Cafe',
                         ),
                       ),
                     );
