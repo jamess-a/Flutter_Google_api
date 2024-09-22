@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'componant/BottomSheetMenu2.dart';
 
 class Map extends StatefulWidget {
   @override
@@ -46,7 +47,7 @@ class _MapScreenState extends State<Map> {
   }
 
   Future<void> _getDirections(LatLng origin, LatLng destination) async {
-    final String apiKey = 'AIzaSyCN5iCJo4eq3UtebW1gvrdTN758Ul7rJO0'; 
+    final String apiKey = 'AIzaSyCN5iCJo4eq3UtebW1gvrdTN758Ul7rJO0';
     final String url =
         'https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=$apiKey';
 
@@ -156,7 +157,7 @@ class _MapScreenState extends State<Map> {
   }
 
   void _onMapTap(LatLng position) {
-    print('Map tapped at: $position'); 
+    print('Map tapped at: $position');
     setState(() {
       _markers.removeWhere((marker) => marker.markerId.value == 'destination');
       _addDestinationMarker(position, 'New Destination');
@@ -173,18 +174,21 @@ class _MapScreenState extends State<Map> {
           ? Center(child: CircularProgressIndicator())
           : _error.isNotEmpty
               ? Center(child: Text('Error: $_error'))
-              : GoogleMap(
-                  onMapCreated: _onMapCreated,
-                  onTap: _onMapTap,
-                  initialCameraPosition: CameraPosition(
-                    target: _currentPosition,
-                    zoom: 14,
+              : Stack(children: [
+                  GoogleMap(
+                    onMapCreated: _onMapCreated,
+                    onTap: _onMapTap,
+                    initialCameraPosition: CameraPosition(
+                      target: _currentPosition,
+                      zoom: 14,
+                    ),
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: true,
+                    polylines: _polylines,
+                    markers: _markers,
                   ),
-                  myLocationEnabled: true,
-                  myLocationButtonEnabled: true,
-                  polylines: _polylines,
-                  markers: _markers,
-                ),
+
+                ]),
     );
   }
 

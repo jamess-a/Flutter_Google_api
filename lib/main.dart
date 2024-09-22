@@ -38,12 +38,12 @@ class _MyAppState extends State<MyApp> {
       title: 'After You!',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 0, 225, 255)),
+            seedColor: const Color.fromARGB(255, 166, 255, 0)),
         useMaterial3: true,
       ),
       darkTheme: ThemeData.dark().copyWith(
         colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 0, 183, 255),
+            seedColor: const Color.fromARGB(255, 166, 255, 0),
             brightness: Brightness.dark),
         useMaterial3: true,
       ),
@@ -239,7 +239,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: <Widget>[
                           const ListTile(
                             leading: Icon(Icons.fastfood),
-                            title: Text('Ramdom Meal ! Now ..'),
+                            title: Text('Ramdom Meal ! Tap Now'),
                             subtitle: Text(
                                 'Dont know what meal is waiting for you! GO get it now!'),
                           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -154,6 +155,7 @@ class _CafeListWidgetState extends State<CafeListWidget> {
                   itemBuilder: (context, index) {
                     final cafe = _cafes[index];
                     final name = cafe['name'] ?? 'Unnamed';
+                    final rating = cafe['rating'] ?? 0.0;
                     final address = cafe['vicinity'] ?? 'No address';
                     final openNow = cafe['opening_hours']?['open_now'] == true
                         ? 'Open Now'
@@ -251,7 +253,7 @@ class _CafeListWidgetState extends State<CafeListWidget> {
                                             Icon(Icons.local_cafe, size: 100)),
                                   ),
                             Padding(
-                              padding: const EdgeInsets.all(16.0),
+                              padding: const EdgeInsets.all(13.0),
                               child: Text(name,
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -259,7 +261,7 @@ class _CafeListWidgetState extends State<CafeListWidget> {
                             ),
                             Padding(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 8.0),
+                                  horizontal: 16.0, vertical: 1.0),
                               child: RichText(
                                 text: TextSpan(
                                   children: [
@@ -276,44 +278,69 @@ class _CafeListWidgetState extends State<CafeListWidget> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(
-                                  right: 16.0, bottom: 8.0),
-                              child: Align(
-                                alignment: Alignment.bottomRight,
-                                child: IconButton(
-                                  icon: Icon(
-                                    isFavorite
-                                        ? Icons.favorite
-                                        : Icons.favorite_border,
-                                    color: isFavorite ? Colors.red : null,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 1.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  RatingBarIndicator(
+                                    rating: rating?.toDouble() ?? 0.0,
+                                    itemBuilder: (context, index) => const Icon(
+                                      Icons.star,
+                                      color: Colors.amber,
+                                    ),
+                                    itemCount: 5,
+                                    itemSize: 20.0,
+                                    direction: Axis.horizontal,
                                   ),
-                                  onPressed: () {
-                                    setState(() {
-                                      if (isFavorite) {
-                                        _favorites.remove(name);
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                                '$name removed from favorites'),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
-                                      } else {
-                                        _favorites.add(name);
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                                '$name added to favorites'),
-                                            backgroundColor: Colors.green,
-                                          ),
-                                        );
-                                      }
-                                      _saveFavorites();
-                                    });
-                                  },
-                                ),
+                                  SizedBox(width: 8.0),
+                                  Text(
+                                    'Rating: $rating',
+                                    style: TextStyle(color: textColor),
+                                  ),
+                                  const Spacer(),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        right: 16.0, bottom: 8.0),
+                                    child: Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: IconButton(
+                                        icon: Icon(
+                                          isFavorite
+                                              ? Icons.favorite
+                                              : Icons.favorite_border,
+                                          color: isFavorite ? Colors.red : null,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            if (isFavorite) {
+                                              _favorites.remove(name);
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                      '$name removed from favorites'),
+                                                  backgroundColor: Colors.red,
+                                                ),
+                                              );
+                                            } else {
+                                              _favorites.add(name);
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                      '$name added to favorites'),
+                                                  backgroundColor: Colors.green,
+                                                ),
+                                              );
+                                            }
+                                            _saveFavorites();
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],

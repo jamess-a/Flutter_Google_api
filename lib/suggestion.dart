@@ -103,7 +103,7 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
                       child: CustomScrollView(
                         controller: _scrollController,
                         slivers: [
-                          SliverAppBar(
+                          const SliverAppBar(
                             floating: true,
                             pinned: true,
                             snap: true,
@@ -129,116 +129,111 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
 
   Widget _buildRestaurantCard(SearchResult restaurant) {
     return Card(
-      margin: const EdgeInsets.all(10),
+      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       elevation: 5,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            ListTile(
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (restaurant.photos != null &&
-                      restaurant.photos!.isNotEmpty)
-                    Container(
-                      width: double.infinity,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        image: DecorationImage(
-                          image: NetworkImage(
-                            "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${restaurant.photos![0].photoReference}&key=$apiKey",
-                          ),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    )
-                  else
-                    Container(
-                      width: double.infinity,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.grey,
-                      ),
-                      child: const Icon(Icons.restaurant,
-                          size: 100, color: Colors.white),
-                    ),
-                  const SizedBox(height: 10),
-                  Text(
-                    restaurant.name ?? 'Restaurant',
-                    style: GoogleFonts.lato(
-                      textStyle: const TextStyle(
-                        fontSize: 24, // Increased font size
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 5),
-                  RatingBarIndicator(
-                    rating: restaurant.rating?.toDouble() ?? 0.0,
-                    itemBuilder: (context, index) => const Icon(
-                      Icons.star,
-                      color: Colors.amber,
-                    ),
-                    itemCount: 5,
-                    itemSize: 20.0,
-                    direction: Axis.horizontal,
-                  ),
-                  if (restaurant.vicinity != null)
-                    Text(
-                      'Address: ${restaurant.vicinity!}',
-                      style: GoogleFonts.lato(
-                        textStyle: const TextStyle(fontSize: 16),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          ListTile(
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (restaurant.photos != null && restaurant.photos!.isNotEmpty)
+                  Container(
+                    width: 800,
+                    height: 200,
+                    decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
+                      image: DecorationImage(
+                        image: NetworkImage(
+                          "https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${restaurant.photos![0].photoReference}&key=$apiKey",
+                        ),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  )
+                else
+                  Container(
+                    width: double.infinity,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.grey,
+                    ),
+                    child: const Icon(Icons.restaurant,
+                        size: 100, color: Colors.white),
+                  ),
+                const SizedBox(height: 10),
+                Text(
+                  restaurant.name ?? 'Restaurant',
+                  style: GoogleFonts.lato(
+                    textStyle: const TextStyle(
+                      fontSize: 24, 
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  onPressed: () {
-                    if (_currentPosition != null &&
-                        restaurant.geometry?.location != null) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MapScreen(
-                            destination: LatLng(
-                                restaurant.geometry!.location!.lat!,
-                                restaurant.geometry!.location!.lng!),
-                            destinationname:
-                                restaurant.name ?? 'Restaurant',
-                          ),
-                        ),
-                      );
-                    }
-                  },
-                  icon: const Icon(Icons.directions),
-                  label: const Text('DIRECTION'),
                 ),
-                const SizedBox(width: 8),
               ],
             ),
-          ],
-        ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 5),
+                RatingBarIndicator(
+                  rating: restaurant.rating?.toDouble() ?? 0.0,
+                  itemBuilder: (context, index) => const Icon(
+                    Icons.star,
+                    color: Colors.amber,
+                  ),
+                  itemCount: 5,
+                  itemSize: 20.0,
+                  direction: Axis.horizontal,
+                ),
+                if (restaurant.vicinity != null)
+                  Text(
+                    'Address: ${restaurant.vicinity!}',
+                    style: GoogleFonts.lato(
+                      textStyle: const TextStyle(fontSize: 16),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () {
+                  if (_currentPosition != null &&
+                      restaurant.geometry?.location != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MapScreen(
+                          destination: LatLng(
+                              restaurant.geometry!.location!.lat!,
+                              restaurant.geometry!.location!.lng!),
+                          destinationname: restaurant.name ?? 'Restaurant',
+                        ),
+                      ),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.directions),
+                label: const Text('DIRECTION'),
+              ),
+              const SizedBox(width: 8),
+            ],
+          ),
+        ],
       ),
     );
   }
