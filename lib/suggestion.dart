@@ -48,6 +48,15 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
     'SEPT CAFE'
   ];
 
+  Future<void> _refreshSuggestions() async {
+    await fetchCafeSuggestions();
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
+
   Future<void> fetchCafeSuggestions() async {
     if (_currentPosition == null) return;
 
@@ -56,8 +65,9 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
           lat: _currentPosition!.latitude, lng: _currentPosition!.longitude),
       10000,
       type: 'cafe',
-      name: 'yellow pumpkin , La-Moon Café , de Forest Cafe & Bakery , SEPT CAFE , Fika Café',
-    ); 
+      name:
+          'yellow pumpkin , La-Moon Café , de Forest Cafe & Bakery , SEPT CAFE , Fika Café',
+    );
 
     if (result != null &&
         result.results != null &&
@@ -107,7 +117,9 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _isLoading
+        body: RefreshIndicator(
+      onRefresh: _refreshSuggestions,
+      child: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _error.isNotEmpty
               ? Center(child: Text('Error: $_error'))
@@ -139,7 +151,7 @@ class _SuggestionWidgetState extends State<SuggestionWidget> {
                         ],
                       ),
                     ),
-    );
+    ));
   }
 
   Widget _buildCard(SearchResult cafe) {

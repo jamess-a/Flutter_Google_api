@@ -9,8 +9,9 @@ import 'suggestion.dart';
 import 'shop.dart';
 import 'scroller.dart';
 import 'fav_cafe.dart';
-import 'BottomSheetMenu.dart';
+import 'componant/BottomSheetMenu.dart';
 import 'Lab/map.dart';
+import 'componant/DialogMenu.dart';
 
 void main() {
   runApp(const MyApp());
@@ -91,40 +92,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<void> _showMyDialog() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('AlertDialog Title'),
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('This is a demo alert dialog.'),
-                Text('Would you like to approve of this message?'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Approve'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -158,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: SizedBox(
-          height: MediaQuery.of(context).size.height * 1.1,
+          height: MediaQuery.of(context).size.height,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -241,43 +208,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: ScrollerWidget(),
               ),
               Container(
-                height: 500,
+                height: 450,
                 child: SuggestionWidget(),
               ),
               Container(
-                  height: 150,
-                  child: GestureDetector(
-                    onLongPress: () {
-                      _showMyDialog();
-                    },
-                    onTap: () {
-                      _showMyDialog();
-                    },
-                    child: Card(
-                      margin: EdgeInsets.only(bottom: 10, left: 5, right: 5),
-                      elevation: 5,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          const ListTile(
-                            leading: Icon(Icons.fastfood),
-                            title: Text('Ramdom Meal ! Tap Now'),
-                            subtitle: Text(
-                                'Dont know what meal is waiting for you! GO get it now!'),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              TextButton(
-                                child: Text('Ramdom Details'),
-                                onPressed: () {},
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  )),
+                child: DialogWidget(),
+              ),
             ],
           ),
         ),
