@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class MapScreen extends StatefulWidget {
-  final LatLng? destination; // The location of the tapped cafe
+  final LatLng? destination;
   final String? destinationname;
 
   MapScreen({required this.destination, this.destinationname});
@@ -36,7 +36,6 @@ class _MapScreenState extends State<MapScreen> {
         mapController!.animateCamera(CameraUpdate.newLatLng(_currentPosition));
       }
 
-      
       if (widget.destination != null) {
         _getDirections(_currentPosition, widget.destination!);
         _markers.add(Marker(
@@ -46,7 +45,6 @@ class _MapScreenState extends State<MapScreen> {
               title: widget.destinationname ?? 'Destination Cafe',
             )));
       } else {
-        
         setState(() {
           _error = 'Destination is not available';
         });
@@ -164,6 +162,7 @@ class _MapScreenState extends State<MapScreen> {
                 target: _currentPosition,
                 zoom: 14,
               ),
+              mapType: MapType.normal,
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
               polylines: _polylines,

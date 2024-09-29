@@ -1,22 +1,26 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:location_api/config.dart';
 import 'dart:convert';
-
 import 'package:path_provider/path_provider.dart';
+
+enum LocationType { home, work }
 
 class MapCard extends StatefulWidget {
   final LatLng? destination;
   final String? destinationname;
   final Function(LatLng) onLocationSaved;
+  final LocationType locationType;
 
-  MapCard(
-      {required this.destination,
-      this.destinationname,
-      required this.onLocationSaved});
+  MapCard({
+    required this.destination,
+    this.destinationname,
+    required this.onLocationSaved,
+    required this.locationType,
+  });
 
   @override
   _MapCardState createState() => _MapCardState();
@@ -27,19 +31,18 @@ class _MapCardState extends State<MapCard> {
   LatLng _currentPosition = LatLng(0.0, 0.0);
   LatLng? _markedPosition;
   bool _isLoading = true;
+  bool _isFetchingDirections = false;
   String _error = '';
   Set<Polyline> _polylines = {};
   List<LatLng> _polylineCoordinates = [];
   Set<Marker> _markers = {};
   LatLng? _savedLocation;
   bool _showDialog = false;
-  bool _showDialog2 = false;
 
   @override
   void initState() {
     super.initState();
     _retrieveSavedLocation();
-
     _getCurrentPosition().then((position) {
       setState(() {
         _currentPosition = LatLng(position.latitude, position.longitude);
@@ -72,19 +75,28 @@ class _MapCardState extends State<MapCard> {
     return directory.path;
   }
 
-  Future<File> get _localFile async {
+  Future<File> _localFile(LocationType type) async {
     final path = await _localPath;
-    return File('$path/location.txt');
+    String fileName;
+    switch (type) {
+      case LocationType.home:
+        fileName = 'location_home.txt';
+        break;
+      case LocationType.work:
+        fileName = 'location_work.txt';
+        break;
+    }
+    return File('$path/$fileName');
   }
 
-  Future<void> writeLocation(LatLng location) async {
-    final file = await _localFile;
+  Future<void> writeLocation(LocationType type, LatLng location) async {
+    final file = await _localFile(type);
     await file.writeAsString('${location.latitude},${location.longitude}');
   }
 
-  Future<LatLng?> readLocation() async {
+  Future<LatLng?> readLocation(LocationType type) async {
     try {
-      final file = await _localFile;
+      final file = await _localFile(type);
       final contents = await file.readAsString();
       final parts = contents.split(',');
       final latitude = double.parse(parts[0]);
@@ -96,7 +108,7 @@ class _MapCardState extends State<MapCard> {
   }
 
   Future<void> _retrieveSavedLocation() async {
-    final location = await readLocation();
+    final location = await readLocation(widget.locationType);
     if (location != null) {
       setState(() {
         _savedLocation = location;
@@ -113,7 +125,7 @@ class _MapCardState extends State<MapCard> {
 
   Future<void> _saveMarkedLocation() async {
     if (_markedPosition != null) {
-      await writeLocation(_markedPosition!);
+      await writeLocation(widget.locationType, _markedPosition!);
       setState(() {
         _savedLocation = _markedPosition;
         _markers.add(Marker(
@@ -144,7 +156,7 @@ class _MapCardState extends State<MapCard> {
       _markedPosition = null;
     });
 
-    final file = await _localFile;
+    final file = await _localFile(widget.locationType);
     try {
       await file.delete();
     } catch (e) {
@@ -155,7 +167,11 @@ class _MapCardState extends State<MapCard> {
   }
 
   Future<void> _getDirections(LatLng origin, LatLng destination) async {
-    final String apiKey = 'AIzaSyCN5iCJo4eq3UtebW1gvrdTN758Ul7rJO0';
+    setState(() {
+      _isFetchingDirections = true;
+    });
+
+    final String apiKey = Config.apiKey;
     final String url =
         'https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=$apiKey';
 
@@ -186,6 +202,10 @@ class _MapCardState extends State<MapCard> {
         _error = 'Failed to fetch directions';
       });
     }
+
+    setState(() {
+      _isFetchingDirections = false;
+    });
   }
 
   List<LatLng> _decodePolyline(String encoded) {
@@ -242,7 +262,13 @@ class _MapCardState extends State<MapCard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.destinationname ?? 'Map'}'),
+        title: Text('${widget.destinationname ?? "Map"}'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: _deleteLocation,
+          ),
+        ],
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
@@ -250,63 +276,64 @@ class _MapCardState extends State<MapCard> {
               children: [
                 GoogleMap(
                   onMapCreated: _onMapCreated,
-                  initialCameraPosition: CameraPosition(
-                    target: _currentPosition,
-                    zoom: 14,
-                  ),
+                  initialCameraPosition:
+                      CameraPosition(target: _currentPosition, zoom: 14.0),
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
-                  polylines: _polylines,
                   markers: _markers,
-                  onTap: (LatLng position) {
+                  polylines: _polylines,
+                  onTap: (position) {
                     setState(() {
                       _markedPosition = position;
                       _markers.add(Marker(
-                        markerId: MarkerId('marked_location'),
+                        markerId: MarkerId('marked_position'),
                         position: position,
                         infoWindow: InfoWindow(
                           title: 'Marked Location',
-                          anchor: Offset(0.5, 0.5),
                         ),
                       ));
                     });
-                    _saveMarkedLocation();
                   },
                 ),
-                if (_showDialog)
-                  Center(
-                    child: AlertDialog(
-                      title: Text('Location Saved'),
-                      content:
-                          Text('Your location has been saved successfully.'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            setState(() {
-                              _showDialog = false;
-                            });
-                          },
-                          child: Text('OK'),
-                        ),
-                      ],
-                    ),
-                  ),
                 if (_error.isNotEmpty)
                   Positioned(
-                    top: 20,
-                    left: 20,
-                    right: 20,
+                    bottom: 10.0,
+                    left: 10.0,
+                    right: 10.0,
                     child: Container(
-                      padding: EdgeInsets.all(8.0),
                       color: Colors.red,
+                      padding: EdgeInsets.all(8.0),
                       child: Text(
                         _error,
                         style: TextStyle(color: Colors.white),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ),
+                if (_showDialog)
+                  AlertDialog(
+                    title: const Text('Location Saved'),
+                    content: const Text(
+                        'Your marked location has been saved successfully.'),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            _showDialog = false;
+                          });
+                        },
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
               ],
             ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _saveMarkedLocation,
+        label: Text('Save Location'),
+        icon: Icon(Icons.save),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
@@ -316,23 +343,22 @@ class _MapCardState extends State<MapCard> {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
+      throw Exception('Location services are disabled.');
     }
 
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
+        throw Exception('Location permissions are denied');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      return Future.error(
+      throw Exception(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
 
-    return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+    return await Geolocator.getCurrentPosition();
   }
 }

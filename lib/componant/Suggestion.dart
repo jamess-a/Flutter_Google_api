@@ -4,7 +4,7 @@ import 'package:google_place/google_place.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'location.dart';
+import '../location.dart';
 
 class SuggestionWidget extends StatefulWidget {
   const SuggestionWidget({super.key});
