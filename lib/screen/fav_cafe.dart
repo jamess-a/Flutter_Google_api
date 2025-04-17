@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'package:location_api/location.dart';
+import 'package:location_api/screen/location.dart';
 
-class FavListRes extends StatelessWidget {
+class FavList extends StatelessWidget {
   final Set<String> favorites;
 
-  const FavListRes({super.key, required this.favorites});
+  const FavList({super.key, required this.favorites});
 
   Future<LatLng?> getLocationFromName(String name, String apiKey) async {
     final String url =
@@ -24,7 +24,7 @@ class FavListRes extends StatelessWidget {
           final location = data['results'][0]['geometry']['location'];
           return LatLng(location['lat'], location['lng']);
         } else {
-          throw Exception('No results found');
+          throw Exception('ไม่พบร้านอาหารที่เเนะนำใกล้ท่าน');
         }
       } else {
         throw Exception('Failed to load location');
@@ -59,7 +59,7 @@ class FavListRes extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Favorite Restaurants'),
+        title: Text('Favorite Cafes'),
       ),
       body: favorites.isEmpty
           ? Center(
@@ -75,7 +75,7 @@ class FavListRes extends StatelessWidget {
                     },
                     child: Card(
                         child: ListTile(
-                      leading: const Icon(Icons.restaurant_menu , color: Colors.brown),
+                      leading: const Icon(Icons.local_cafe , color: Colors.brown),
                       title: Text(name),
                       trailing: const Icon(Icons.chevron_right),
                     )));

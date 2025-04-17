@@ -39,8 +39,8 @@ class _DialogWidgetState extends State<DialogWidget> {
   late GooglePlace googlePlace;
   bool _isLoading = false;
   String _error = '';
-  SearchResult? _randomRestaurant; // Keep the search result type
-  DetailsResult? _restaurantDetails; // Use this for detailed info
+  SearchResult? _randomRestaurant;
+  DetailsResult? _restaurantDetails;
 
   @override
   void initState() {
@@ -53,17 +53,15 @@ class _DialogWidgetState extends State<DialogWidget> {
       _isLoading = true;
       _error = '';
       _randomRestaurant = null;
-      _restaurantDetails = null; // Reset details
+      _restaurantDetails = null;
     });
-
-    // Show loading dialog
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return const AlertDialog(
           content: Row(
-            children: const [
+            children: [
               CircularProgressIndicator(),
               SizedBox(width: 20),
               Text('Loading...'),
@@ -144,7 +142,7 @@ class _DialogWidgetState extends State<DialogWidget> {
       });
     } else {
       setState(() {
-        _error = 'No restaurants found';
+        _error = 'ไม่พบร้านอาหารที่เเนะนำใกล้ท่าน';
       });
     }
   }
@@ -265,11 +263,11 @@ class _DialogWidgetState extends State<DialogWidget> {
       barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Error'),
+          title: const Text('เเจ้งเตือน'),
           content: Text(error),
           actions: <Widget>[
             TextButton(
-              child: const Text('OK'),
+              child: const Text('ปิด'),
               onPressed: () {
                 Navigator.of(context).pop();
               },

@@ -20,8 +20,8 @@ dependencies:
   flutter_rating_bar: ^4.0.0
   shared_preferences: ^2.0.15
   path_provider: ^2.0.11
-  
-
+  flutter_dotenv: ^5.0.2
+  provider: ^6.0.0
 
 dev_dependencies:
   flutter_test:
@@ -31,3 +31,11 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: Kanit
+      fonts:
+        - asset: assets/fonts/Kanit-Regular.ttf
+        - asset: assets/fonts/Kanit-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Kanit-Italic.ttf
+          style: italic

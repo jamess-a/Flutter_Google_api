@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'package:location_api/location.dart';
+import 'package:location_api/screen/location.dart';
 
-class FavListShop extends StatelessWidget {
+class FavListRes extends StatelessWidget {
   final Set<String> favorites;
 
-  const FavListShop({super.key, required this.favorites});
+  const FavListRes({super.key, required this.favorites});
 
   Future<LatLng?> getLocationFromName(String name, String apiKey) async {
     final String url =
@@ -59,7 +59,7 @@ class FavListShop extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Favorite Shops'),
+        title: Text('Favorite Restaurants'),
       ),
       body: favorites.isEmpty
           ? Center(
@@ -75,7 +75,7 @@ class FavListShop extends StatelessWidget {
                     },
                     child: Card(
                         child: ListTile(
-                      leading: const Icon(Icons.local_convenience_store_rounded , color: Colors.brown),
+                      leading: const Icon(Icons.restaurant_menu , color: Colors.brown),
                       title: Text(name),
                       trailing: const Icon(Icons.chevron_right),
                     )));

@@ -5,14 +5,14 @@ import 'package:location_api/screen/fav_shop.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Bottomsheetmenu extends StatefulWidget {
-  const Bottomsheetmenu({super.key});
+class Detailsheetmenu extends StatefulWidget {
+  const Detailsheetmenu({super.key});
 
   @override
-  State<Bottomsheetmenu> createState() => _BottomsheetmenuState();
+  State<Detailsheetmenu> createState() => _BottomsheetmenuState();
 }
 
-class _BottomsheetmenuState extends State<Bottomsheetmenu> {
+class _BottomsheetmenuState extends State<Detailsheetmenu> {
   Set<String> _favorites = Set<String>();
   Set<String> _loadFavorites_restaurant = Set<String>();
   Set<String> _loadFavorites_shops = Set<String>();
@@ -20,23 +20,6 @@ class _BottomsheetmenuState extends State<Bottomsheetmenu> {
   @override
   void initState() {
     super.initState();
-    _loadFavorites();
-  }
-
-  Future<void> _loadFavorites() async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      setState(() {
-        _favorites = prefs.getStringList('favorites')?.toSet() ?? Set<String>();
-        _loadFavorites_restaurant =
-            prefs.getStringList('restaruant_favorites')?.toSet() ??
-                Set<String>();
-        _loadFavorites_shops =
-            prefs.getStringList('shop_favorites')?.toSet() ?? Set<String>();
-      });
-    } catch (e) {
-      print('Error loading favorites: $e');
-    }
   }
 
   void _openfavScreen() {
@@ -100,4 +83,5 @@ Widget _buildBottomSheetMenu(BuildContext context, VoidCallback openfavScreen,
       ),
     ],
   );
+  
 }

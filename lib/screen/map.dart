@@ -3,7 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'componant/BottomSheetMenu2.dart';
+import '../componant/BottomSheetMenu2.dart';
 
 class Map extends StatefulWidget {
   @override

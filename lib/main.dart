@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'location.dart';
-import 'cafe.dart';
-import 'map.dart';
-import 'restaurant.dart';
+import 'package:location_api/screen/cafe.dart';
+import 'package:location_api/screen/restaurant.dart';
+import 'package:location_api/screen/shop.dart';
 import 'componant/Suggestion.dart';
-import 'shop.dart';
 import 'componant/Scroller.dart';
-import 'fav_cafe.dart';
 import 'componant/BottomSheetMenu.dart';
 import 'Lab/map.dart';
 import 'componant/DialogMenu.dart';
@@ -124,98 +119,117 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(top: 10, left: 21),
-                    child: Icon(Icons.location_on),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(top: 10, left: 21),
-                    child: Text(
-                      'Find Your Place around You !!',
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 18,
-                      ),
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  margin: EdgeInsets.only(top: 10, left: 21),
+                  child: Icon(Icons.location_on),
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 10, left: 21),
+                  child: Text(
+                    'Find Your Place around You !!',
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 18,
                     ),
                   ),
-                ],
-              ),
-              Container(
-                margin: EdgeInsets.all(5),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.all(4),
-                        child: ElevatedButton(
-                          onPressed: _openMapScreen,
-                          child: const Text('Open Map'),
-                        ),
+                ),
+              ],
+            ),
+            Container(
+              margin: const EdgeInsets.all(5),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                      margin: const EdgeInsets.all(4),
+                      child: ElevatedButton(
+                        onPressed: _openMapScreen,
+                        child: const Text('Open Map'),
                       ),
-                      Container(
-                        margin: EdgeInsets.all(4),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CafeListWidget()),
-                            );
-                          },
-                          child: const Text('Café List'),
-                        ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.all(4),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CafeListWidget()),
+                          );
+                        },
+                        child: const Text('Café List'),
                       ),
-                      Container(
-                        margin: EdgeInsets.all(4),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RestaurantListWidget()),
-                            );
-                          },
-                          child: const Text('Restaurant List'),
-                        ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.all(4),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RestaurantListWidget()),
+                          );
+                        },
+                        child: const Text('Restaurant List'),
                       ),
-                      Container(
-                        margin: EdgeInsets.all(4),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ShopListWidget()),
-                            );
-                          },
-                          child: const Text('Shop List'),
-                        ),
-                      )
-                    ],
-                  ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.all(4),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ShopListWidget()),
+                          );
+                        },
+                        child: const Text('Shop List'),
+                      ),
+                    )
+                  ],
                 ),
               ),
-              Container(
-                child: ScrollerWidget(),
+            ),
+            Container(
+              padding: const EdgeInsets.all(1),
+              child: const ScrollerWidget(),
+            ),
+            Container(
+              padding: const EdgeInsets.all(1),
+              height: 450,
+              child: const SuggestionWidget(),
+            ),
+            Container(
+              padding: const EdgeInsets.all(1),
+              child: const DialogWidget(),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              height: 130,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: const [
+                  SizedBox(width: 10),
+                  Placeholder(fallbackHeight: 100, fallbackWidth: 100),
+                  SizedBox(width: 10),
+                  Placeholder(fallbackHeight: 100, fallbackWidth: 100),
+                  SizedBox(width: 10),
+                  Placeholder(fallbackHeight: 100, fallbackWidth: 100),
+                  SizedBox(width: 10),
+                  Placeholder(fallbackHeight: 100, fallbackWidth: 100),
+                  SizedBox(width: 10),
+                ],
               ),
-              Container(
-                height: 450,
-                child: SuggestionWidget(),
-              ),
-              Container(
-                child: DialogWidget(),
-              ),
-            ],
-          ),
+            )
+          ],
         ),
       ),
     );

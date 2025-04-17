@@ -7,6 +7,8 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'fav_cafe.dart';
 import 'location.dart';
+import 'package:provider/provider.dart';
+import '../service/api_key_provider.dart';
 
 class CafeListWidget extends StatefulWidget {
   @override
@@ -19,7 +21,6 @@ class _CafeListWidgetState extends State<CafeListWidget> {
   List<dynamic> _cafes = [];
   Set<String> _favorites = Set<String>();
   LatLng? _currentPosition;
-  final String apiKey = 'AIzaSyCN5iCJo4eq3UtebW1gvrdTN758Ul7rJO0';
 
   @override
   void initState() {
@@ -59,8 +60,16 @@ class _CafeListWidgetState extends State<CafeListWidget> {
     }
   }
 
+  Future<String> _getApiKey() async {
+    final String apiKey =
+        Provider.of<ApiKeyProvider>(context, listen: false).apiKey;
+    return apiKey;
+  }
+
   Future<void> _fetchNearbyCafes() async {
     if (_currentPosition == null) return;
+
+    final apiKey = await _getApiKey();
 
     final String url =
         'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
@@ -89,6 +98,7 @@ class _CafeListWidgetState extends State<CafeListWidget> {
   }
 
   Future<String?> _getPhotoUrl(String photoReference) async {
+    final apiKey = await _getApiKey();
     final String photoUrl = 'https://maps.googleapis.com/maps/api/place/photo'
         '?maxwidth=800'
         '&photoreference=$photoReference'
